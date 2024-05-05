@@ -6,7 +6,7 @@
 <div class="mb-3">
     @foreach (var kaart in kaarten) {
         var pad = $"/images/{kaart}.png";
-        <img src=@pad width="48" />
+        <img class="me-2" src=@pad width="48" />
     }
 </div>
 <p class="alert alert-info">Jouw score : @currentScore</p>

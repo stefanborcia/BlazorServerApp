@@ -1,4 +1,5 @@
 ﻿@page "/fetchdata"
+@page "/fetchdata/{dag:int}"
 @using BlazorServerApp.Data
 @inject WeatherForecastService ForecastService
 
@@ -14,16 +15,27 @@
 }
 else
 {
-    <table class="table">
-        <thead>
+    if (Dag > 0 && Dag < 6)
+    {
+        var forecast = forecasts[Dag - 1];
+        <h3>Forecast for @forecast.Date.ToShortDateString() (today + @Dag day(s))
+        </h3>
+        <p>Temp. (C) : @forecast.TemperatureC</p>
+        <p>Temp. (F) : @forecast.TemperatureF</p>
+        <p>Summary : @forecast.Summary</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
             <tr>
                 <th>Date</th>
                 <th>Temp. (C)</th>
                 <th>Temp. (F)</th>
                 <th>Summary</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             @foreach (var forecast in forecasts)
             {
                 <tr>
@@ -33,12 +45,15 @@ else
                     <td>@forecast.Summary</td>
                 </tr>
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    }
 }
 
 @code {
     private WeatherForecast[]? forecasts;
+    [Parameter]
+    public int Dag { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
