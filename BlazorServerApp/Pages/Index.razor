@@ -2,16 +2,35 @@
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
-<ErrorBoundary>
-    <ChildContent>
-        <FetchData/>
-    </ChildContent>
-    <ErrorContent>
-        <p class="alert alert-danger">Fetchdata component out of order…</p>
-    </ErrorContent>
-</ErrorBoundary>
+<section id="welcome-section">
+    <div id="welcome-section-container">
+        <div class="welcome-section-img-container">
+            <img src="/images/eu.png" alt="black and white profile photo">
+            <h1><span>Hello, <br>my name is </span><br>Stefan Iulian<br>Borcia</h1>
+        </div>
+        <div class="arrow-down-container">
+            <a href="#about_section_anchor"><i class="arrow-down"></i></a>
+        </div>
+    </div>
+</section>
+<section id="about">
+    <a class="anchor" id="about_section_anchor"></a>
+    <h2>About Me</h2>
+    <p>Self-motivated flexible developer with applicable relevant database knowledge and coding skills.</p>
+    <p>Organized programmer looking for an opportunity to grow as a developer and support an ambitious technology company. </p>
+    <div id="skill-list">
+        <p>
+            <span>HTML5</span>
+            <span>CSS3</span>
+            <span>Bootstrap</span>
+            <span>JavaScript</span>
+            <span>SQL</span>
+            <span>Responsive Design</span>
+            <span>.NET</span>
+            <span>AZURE</span>
+            <span>C#</span>
+            <span>REST Web API</span>
+            <span>Entity Framework</span>
+        </p>
+    </div>
+</section>
