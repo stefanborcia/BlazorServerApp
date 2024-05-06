@@ -1,4 +1,8 @@
 ﻿@page "/todo"
+@using BlazorServerApp.Services
+@using BlazorServerApp.Data
+@inject TodoService TodoService
+@inject TodoDbContext _context;
 
 <h3 class="text-center">Todo (@todos.Count(todo => !todo.IsDone))</h3>
 
@@ -42,7 +46,7 @@
     </div>
 </div>
 <div class="text-center">
-    <button id="addTodo" @onclick="AddTodo" class="btn btn-success">Add todo</button>
+    <button id="addTodo" @onclick="AddTodoAsync" class="btn btn-success">Add todo</button>
 </div>
 <table class="table table-fit mt-5">
     <thead>
@@ -58,8 +62,8 @@
         @foreach (var todo in todos)
         {
             <tr>
-                <td><input type="checkbox" @bind="todo.IsDone" /></td>
-                <td>@todo.Task</td>
+                <td width="15%"><input type="checkbox" @bind="todo.IsDone" /></td>
+                <td width="50%">@todo.Task</td>
                 <td>
                     <div style="display: flex">
                         <div style="margin-right: 5px">
@@ -76,11 +80,11 @@
                         </div>
                     </div>
                 </td>
-                <td class="badge badge-center badge-fit"
+                <td width="15%" class="badge badge-center badge-fit"
                     style="@($"background-color: {(todo.Priority == "High" ? "red" : todo.Priority == "Normal" ? "orange" : "yellow")};")">
                     @todo.Priority
                 </td>
-                <td>
+                <td width="10%">
                     <div class="delete">
                         <button class="btn btn-sm btn-danger" @onclick="() => DeleteTodo(todo)">Delete</button>
                     </div>
@@ -97,7 +101,12 @@
     private string dateErrorMessage;
     private TodoItem editingTodo;
     private bool isEditing;
-    void AddTodo()
+
+    protected override async Task OnInitializedAsync()
+    {
+        todos = await TodoService.GetTodosAsync();
+    }
+    async Task AddTodoAsync()
     {
         if (string.IsNullOrWhiteSpace(newTodo.Task))
         {
@@ -118,28 +127,33 @@
         else
         {
             var todoItem = new TodoItem
-                {
-                    Task = newTodo.Task,
-                    DueDate = newTodo.DueDate,
-                    DueTime = newTodo.DueTime,
-                    Priority = newTodo.Priority
-                };
+            {
+                Task = newTodo.Task,
+                DueDate = newTodo.DueDate,
+                DueTime = newTodo.DueTime,
+                Priority = newTodo.Priority
+            };
 
-            todos.Add(todoItem);
+            await TodoService.AddTodoAsync(todoItem);
+            todos = await TodoService.GetTodosAsync(); // Refresh list
+            errorMessage = null;
+            dateErrorMessage = null;
+
+            // Clear input fields after adding todo
             newTodo.Task = "";
             newTodo.DueDate = null;
             newTodo.DueTime = null;
             newTodo.Priority = "Normal";
-            errorMessage = null;
-            dateErrorMessage = null;
+
+            // Notify Blazor to update UI
             StateHasChanged();
         }
     }
-    void DeleteTodo(TodoItem todo)
+    async Task DeleteTodo(TodoItem todo) 
     {
-        todos.Remove(todo);
-        isEditing = false;
-        StateHasChanged();
+        await TodoService.DeleteTodoAsync(todo);
+        todos = await TodoService.GetTodosAsync(); // Refresh list
+        StateHasChanged(); 
     }
     void ClearTaskError()
     {
