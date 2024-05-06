@@ -1,40 +1,139 @@
 ﻿@page "/todo"
 
-<h3>Todo (@todos.Count(todo => !todo.IsDone))</h3>
-<div class="form-group mb-3">
-    <input @bind="newTodo.Task" type="text" class="form-control" required />
-    <div class="text-danger" style="display: @(errorMessage != null ? "block" : "none")"> 
-        @errorMessage 
-    </div> 
-</div>
-<button @onclick="AddTodo" class="btn btn-primary">Add todo</button>
+<h3 class="text-center">Todo (@todos.Count(todo => !todo.IsDone))</h3>
 
-<ol class="mt-3">
-    @foreach (var todo in todos)
-    {
-        <li>
-            <input type="checkbox" @bind="todo.IsDone" />
-            @todo.Task
-        </li>
-    }
-</ol>
+<div class="card-group d-flex justify-content-between ">
+    <div class="card bg-light mb-3 w-100">
+        <div class="card-header text-center">Todo Task</div>
+        <div class="card-body">
+            <input @bind="newTodo.Task" type="text" class="form-control" required @oninput="ClearTaskError" placeholder="Enter your task..." />
+            <div class="text-danger" style="display: @(errorMessage != null ? "block" : "none")">
+                @errorMessage 
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-light mb-3 w-100">
+        <div class="card-header text-center">Due Date & Due Time</div> <div class="card-body">
+            @{
+                var minDate = DateTime.Now.ToString("yyyy-MM-dd");
+            }
+            <div class="d-flex justify-content-around">
+                <div>
+                    <input @bind="newTodo.DueDate" type="date" class="form-control" required min="@minDate" @oninput="ClearDateError" />
+                </div>
+                <div>
+                    <input @bind="newTodo.DueTime" type="time" class="form-control" required /> 
+                </div>
+            </div>
+            <div class="text-danger" style="display: @(dateErrorMessage != null ? "block" : "none")">@dateErrorMessage</div>
+        </div>
+    </div>
+
+    <div class="card bg-light mb-3 w-100">
+        <div class="card-header text-center">Choose Priority</div>
+        <div class="card-body">
+            <select @bind="newTodo.Priority" class="form-select">
+                <option value="High">High</option>
+                <option value="Normal" selected>Normal</option>
+                <option value="Low">Low</option>
+            </select>
+        </div>
+    </div>
+</div>
+<div class="text-center">
+    <button id="addTodo" @onclick="AddTodo" class="btn btn-success">Add todo</button>
+</div>
+<table class="table table-fit mt-5">
+    <thead>
+        <tr>
+            <th>Done</th>
+            <th>Task</th>
+            <th>Due Date & Due Time</th>
+            <th class="text-center">Priority</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var todo in todos)
+        {
+            <tr>
+                <td><input type="checkbox" @bind="todo.IsDone" /></td>
+                <td>@todo.Task</td>
+                <td>
+                    <div style="display: flex">
+                        <div style="margin-right: 5px">
+                            @if (todo.DueDate.HasValue && todo.DueTime.HasValue)
+                            {
+                                @(todo.DueDate.Value.Add(todo.DueTime.Value.ToTimeSpan()).ToString("d MMM yyyy, h:mm tt"))
+                            }
+                            else
+                            {
+                                @:N/A
+                            }
+                        </div>
+                        <div class="text-danger" style="display: @(dateErrorMessage != null ? "block" : "none")">
+                        </div>
+                    </div>
+                </td>
+                <td class="badge badge-center badge-fit"
+                    style="@($"background-color: {(todo.Priority == "High" ? "red" : todo.Priority == "Normal" ? "orange" : "yellow")};")">
+                    @todo.Priority
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
     private List<TodoItem> todos = new();
-    public TodoItem newTodo = new TodoItem();  
+    public TodoItem newTodo = new TodoItem();
     private string errorMessage;
-
+    private string dateErrorMessage;
     void AddTodo()
     {
-        if (string.IsNullOrWhiteSpace(newTodo.Task)) 
+        if (string.IsNullOrWhiteSpace(newTodo.Task))
         {
             errorMessage = "This field is required.";
-        } else {
-            var todoItem = new TodoItem { Task = newTodo.Task }; 
+        }
+        else if (newTodo.DueDate <= DateTime.Now)
+        {
+            dateErrorMessage = "Due date cannot be in the past.";
+        }
+        else if (!newTodo.DueDate.HasValue)
+        {
+            dateErrorMessage = "Please select a due date.";
+        }
+        else if (!newTodo.DueTime.HasValue)
+        {
+            dateErrorMessage = "Please select a time.";
+        }
+        else
+        {
+            var todoItem = new TodoItem
+            {
+                Task = newTodo.Task,
+                DueDate = newTodo.DueDate, 
+                DueTime = newTodo.DueTime, 
+                Priority = newTodo.Priority
+            };
+
             todos.Add(todoItem);
-            newTodo.Task = ""; 
-            errorMessage = null; 
+            newTodo.Task = "";
+            newTodo.DueDate = null;
+            newTodo.DueTime = null; 
+            newTodo.Priority = "Normal";
+            errorMessage = null;
+            dateErrorMessage = null;
             StateHasChanged();
         }
+    }
+    private void ClearTaskError()
+    {
+        errorMessage = null;
+    }
+
+    private void ClearDateError()
+    {
+        dateErrorMessage = null;
     }
 }
