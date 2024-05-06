@@ -23,7 +23,7 @@
                     <input @bind="newTodo.DueDate" type="date" class="form-control" required min="@minDate" @oninput="ClearDateError" />
                 </div>
                 <div>
-                    <input @bind="newTodo.DueTime" type="time" class="form-control" required /> 
+                    <input @bind="newTodo.DueTime" type="time" class="form-control" required />
                 </div>
             </div>
             <div class="text-danger" style="display: @(dateErrorMessage != null ? "block" : "none")">@dateErrorMessage</div>
@@ -51,6 +51,7 @@
             <th>Task</th>
             <th>Due Date & Due Time</th>
             <th class="text-center">Priority</th>
+            <th class="text-center">Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -79,6 +80,11 @@
                     style="@($"background-color: {(todo.Priority == "High" ? "red" : todo.Priority == "Normal" ? "orange" : "yellow")};")">
                     @todo.Priority
                 </td>
+                <td>
+                    <div class="delete">
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteTodo(todo)">Delete</button>
+                    </div>
+                </td>
             </tr>
         }
     </tbody>
@@ -89,6 +95,8 @@
     public TodoItem newTodo = new TodoItem();
     private string errorMessage;
     private string dateErrorMessage;
+    private TodoItem editingTodo;
+    private bool isEditing;
     void AddTodo()
     {
         if (string.IsNullOrWhiteSpace(newTodo.Task))
@@ -110,29 +118,35 @@
         else
         {
             var todoItem = new TodoItem
-            {
-                Task = newTodo.Task,
-                DueDate = newTodo.DueDate, 
-                DueTime = newTodo.DueTime, 
-                Priority = newTodo.Priority
-            };
+                {
+                    Task = newTodo.Task,
+                    DueDate = newTodo.DueDate,
+                    DueTime = newTodo.DueTime,
+                    Priority = newTodo.Priority
+                };
 
             todos.Add(todoItem);
             newTodo.Task = "";
             newTodo.DueDate = null;
-            newTodo.DueTime = null; 
+            newTodo.DueTime = null;
             newTodo.Priority = "Normal";
             errorMessage = null;
             dateErrorMessage = null;
             StateHasChanged();
         }
     }
-    private void ClearTaskError()
+    void DeleteTodo(TodoItem todo)
+    {
+        todos.Remove(todo);
+        isEditing = false;
+        StateHasChanged();
+    }
+    void ClearTaskError()
     {
         errorMessage = null;
     }
 
-    private void ClearDateError()
+    void ClearDateError()
     {
         dateErrorMessage = null;
     }
