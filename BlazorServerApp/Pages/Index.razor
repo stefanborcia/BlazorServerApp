@@ -2,35 +2,43 @@
 
 <PageTitle>Index</PageTitle>
 
-<section id="welcome-section">
-    <div id="welcome-section-container">
-        <div class="welcome-section-img-container">
-            <img src="/images/eu.png" alt="black and white profile photo">
-            <h1><span>Hello, <br>my name is </span><br>Stefan Iulian<br>Borcia</h1>
+<div class="container-fluid" id="top">
+
+    <div class="pagehead">
+        <h1 class="fade-in one intro">Hi, I'm Stefan.</h1>
+        <p class="fade-in two blurb">I am a hard-working and driven individual who isn’t afraid to face a challenge.</p>
+    </div>
+    <div class="fade-in three main">
+        <div class="content" id="about">
+            <div class="row text-center">
+                <div class="profile-pic col-md-offset-1 col-md-3">
+                    <img class="img-responsive" src="/images/eu.png" alt="My profile picture." width="200px">
+                </div>
+                <div class="col-md-7">
+                    <p class="highlight-text mt-5 align-center pt-5">
+                        I would describe myself as an open and honest person who doesn’t believe in misleading other people and tries to be fair in everything I do.<br/>
+                        I would say that I’m creative, hard-working, and detail-oriented.<br/>
+                        I’m very communicative, detail-oriented, and versatile. I like to think of myself as a team player.<br/>
+                        While I don’t mind taking on solo projects, I prefer to work with others.</p>
+                </div>
+            </div>
+            <div class="nav"><a href="#top"><i class="fa fa-arrow-up"></i></a></div>
         </div>
-        <div class="arrow-down-container">
-            <a href="#about_section_anchor"><i class="arrow-down"></i></a>
+       
+        <div class="content" id="footer">
+            <p>Made with <i class="fa fa-heart"></i> and <i class="fa fa-coffee"></i>.&nbsp;&nbsp;<i class="fa fa-copyright"></i> Borcia Stefan Iulian 2024</p>
         </div>
     </div>
-</section>
-<section id="about">
-    <a class="anchor" id="about_section_anchor"></a>
-    <h2>About Me</h2>
-    <p>Self-motivated flexible developer with applicable relevant database knowledge and coding skills.</p>
-    <p>Organized programmer looking for an opportunity to grow as a developer and support an ambitious technology company. </p>
-    <div id="skill-list">
-        <p>
-            <span>HTML5</span>
-            <span>CSS3</span>
-            <span>Bootstrap</span>
-            <span>JavaScript</span>
-            <span>SQL</span>
-            <span>Responsive Design</span>
-            <span>.NET</span>
-            <span>AZURE</span>
-            <span>C#</span>
-            <span>REST Web API</span>
-            <span>Entity Framework</span>
-        </p>
-    </div>
-</section>
+
+</div>
+
+
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.scrollto/2.1.2/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="js/init.js"></script>
+<script>
+    $('a[href^="#"]').click(function (e) {
+        e.preventDefault();
+        $(window).stop(true).scrollTo(this.hash, { duration: 500, interrupt: false });
+    });
+</script>
