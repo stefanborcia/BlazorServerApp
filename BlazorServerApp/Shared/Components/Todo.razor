@@ -1,16 +1,14 @@
 ﻿@page "/todo"
 @using BlazorServerApp.Services
-@using BlazorServerApp.Data
 @inject TodoService TodoService
-@inject TodoDbContext _context;
 
 <h3 class="text-center">Todo (@todos.Count(todo => !todo.IsDone))</h3>
 
 <div class="card-group d-flex justify-content-between ">
     <div class="card bg-light mb-3 w-100">
-        <div class="card-header text-center">Todo Task</div>
+        <div class="card-header text-center">Title Task</div>
         <div class="card-body">
-            <input @bind="newTodo.Task" type="text" class="form-control" required @oninput="ClearTaskError" placeholder="Enter your task..." />
+            <input @bind="newTodo.Title" type="text" class="form-control" required @oninput="ClearTaskError" placeholder="Enter your task..." />
             <div class="text-danger" style="display: @(errorMessage != null ? "block" : "none")">
                 @errorMessage 
             </div>
@@ -24,10 +22,7 @@
             }
             <div class="d-flex justify-content-around">
                 <div>
-                    <input @bind="newTodo.DueDate" type="date" class="form-control" required min="@minDate" @oninput="ClearDateError" />
-                </div>
-                <div>
-                    <input @bind="newTodo.DueTime" type="time" class="form-control" required />
+                    <input @bind="newTodo.DueDateTime" type="datetime-local" class="form-control" required />
                 </div>
             </div>
             <div class="text-danger" style="display: @(dateErrorMessage != null ? "block" : "none")">@dateErrorMessage</div>
@@ -52,7 +47,7 @@
     <thead>
         <tr>
             <th>Done</th>
-            <th>Task</th>
+            <th>Title Task</th>
             <th>Due Date & Due Time</th>
             <th class="text-center">Priority</th>
             <th class="text-center">Actions</th>
@@ -63,13 +58,13 @@
         {
             <tr>
                 <td width="15%"><input type="checkbox" @bind="todo.IsDone" /></td>
-                <td width="50%">@todo.Task</td>
+                <td width="50%">@todo.Title</td>
                 <td>
                     <div style="display: flex">
                         <div style="margin-right: 5px">
-                            @if (todo.DueDate.HasValue && todo.DueTime.HasValue)
+                            @if (todo.DueDateTime.HasValue)
                             {
-                                @(todo.DueDate.Value.Add(todo.DueTime.Value.ToTimeSpan()).ToString("d MMM yyyy, h:mm tt"))
+                                @(todo.DueDateTime.Value.ToString("d MMM yyyy, h:mm tt"))
                             }
                             else
                             {
@@ -96,72 +91,64 @@
 
 @code {
     private List<TodoItem> todos = new();
-    public TodoItem newTodo = new TodoItem();
-    private string errorMessage;
-    private string dateErrorMessage;
-    private TodoItem editingTodo;
-    private bool isEditing;
+    public TodoItem newTodo = null!;
+
+    private string? errorMessage;
+    private string? dateErrorMessage;
+
+    protected override void OnInitialized()
+    {
+        newTodo = new TodoItem();
+    }
 
     protected override async Task OnInitializedAsync()
     {
         todos = await TodoService.GetTodosAsync();
     }
+
     async Task AddTodoAsync()
     {
-        if (string.IsNullOrWhiteSpace(newTodo.Task))
+        if (string.IsNullOrWhiteSpace(newTodo.Title))
         {
             errorMessage = "This field is required.";
         }
-        else if (newTodo.DueDate <= DateTime.Now)
+        else if (newTodo.DueDateTime.HasValue && newTodo.DueDateTime.Value <= DateTime.Now)
         {
             dateErrorMessage = "Due date cannot be in the past.";
         }
-        else if (!newTodo.DueDate.HasValue)
+        else if (!newTodo.DueDateTime.HasValue)
         {
-            dateErrorMessage = "Please select a due date.";
-        }
-        else if (!newTodo.DueTime.HasValue)
-        {
-            dateErrorMessage = "Please select a time.";
+            dateErrorMessage = "Please select a due date and time.";
         }
         else
         {
             var todoItem = new TodoItem
             {
-                Task = newTodo.Task,
-                DueDate = newTodo.DueDate,
-                DueTime = newTodo.DueTime,
+                Title = newTodo.Title,
+                DueDateTime = newTodo.DueDateTime,
                 Priority = newTodo.Priority
             };
 
             await TodoService.AddTodoAsync(todoItem);
-            todos = await TodoService.GetTodosAsync(); // Refresh list
+            todos = await TodoService.GetTodosAsync();
             errorMessage = null;
             dateErrorMessage = null;
 
-            // Clear input fields after adding todo
-            newTodo.Task = "";
-            newTodo.DueDate = null;
-            newTodo.DueTime = null;
-            newTodo.Priority = "Normal";
+            newTodo = new TodoItem();
 
-            // Notify Blazor to update UI
             StateHasChanged();
         }
     }
-    async Task DeleteTodo(TodoItem todo) 
+
+    async Task DeleteTodo(TodoItem todo)
     {
         await TodoService.DeleteTodoAsync(todo);
-        todos = await TodoService.GetTodosAsync(); // Refresh list
-        StateHasChanged(); 
+        todos = await TodoService.GetTodosAsync();
+        StateHasChanged();
     }
+
     void ClearTaskError()
     {
         errorMessage = null;
-    }
-
-    void ClearDateError()
-    {
-        dateErrorMessage = null;
     }
 }

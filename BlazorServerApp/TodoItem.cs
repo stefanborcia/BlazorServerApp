@@ -1,17 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BlazorServerApp
 {
     public class TodoItem
     {
         public int Id { get; set; }
+        [MaxLength(100)]
         public string? Title { get; set; }
         public bool IsDone { get; set; } = false;
-        public string Task { get; set; }
-
-        public DateTime? DueDate { get; set; }
+        [MaxLength(20)]
         public string Priority { get; set; } = "Normal";
-        [NotMapped]
-        public TimeOnly? DueTime { get; set; }
+        public DateTime? DueDateTime { get; set; }
     }
 }

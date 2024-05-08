@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BlazorServerApp.Data
 {
@@ -8,5 +9,6 @@ namespace BlazorServerApp.Data
         {
         }
         public DbSet<TodoItem> Todos { get; set; }
+
     }
 }
