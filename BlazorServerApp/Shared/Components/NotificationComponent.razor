@@ -1,0 +1,22 @@
+﻿<h3>NotificationComponent</h3>
+
+<div class="alert alert-@MessageType slide-in" role="alert" @onclick="Dismiss">
+    @Message
+</div>
+
+@code {
+    [Parameter] public string Message { get; set; }
+    [Parameter] public string MessageType { get; set; } = "info";
+    [Parameter] public EventCallback OnDismiss { get; set; }
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Task.Delay(3000); // Timeout for auto-dismiss
+        await Dismiss();
+    }
+
+    private async Task Dismiss()
+    {
+        await OnDismiss.InvokeAsync();
+    }
+}

@@ -3,7 +3,12 @@
 @inject TodoService TodoService
 
 <h3 class="text-center">Todo (@todos.Count(todo => !todo.IsDone))</h3>
-
+<div id="notifications-container">
+    @if (showNotification)
+    {
+        <NotificationComponent Message="@notificationMessage" MessageType="success" OnDismiss="@(() => showNotification = false)" />
+    }
+</div>
 <div class="card-group d-flex justify-content-between ">
     <div class="card bg-light mb-3 w-100">
         <div class="card-header text-center">Title Task</div>
@@ -90,6 +95,8 @@
 </table>
 
 @code {
+    private bool showNotification = false;
+    private string notificationMessage = "";
     private List<TodoItem> todos = new();
     public TodoItem newTodo = null!;
 
@@ -135,7 +142,8 @@
             dateErrorMessage = null;
 
             newTodo = new TodoItem();
-
+            showNotification = true;
+            notificationMessage = "Todo added successfully!";
             StateHasChanged();
         }
     }
@@ -144,6 +152,8 @@
     {
         await TodoService.DeleteTodoAsync(todo);
         todos = await TodoService.GetTodosAsync();
+        showNotification = true;
+        notificationMessage = "Todo deleted!";
         StateHasChanged();
     }
 

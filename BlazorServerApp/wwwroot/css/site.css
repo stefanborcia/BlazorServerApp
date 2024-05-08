@@ -264,3 +264,16 @@ li {
     #footer a {
         color: #888;
     }
+.alert {
+    opacity: 0;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000; 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+    .alert.slide-in {
+        opacity: 1;
+        transform: translateX(0);
+    }

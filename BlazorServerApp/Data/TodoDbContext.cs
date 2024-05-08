@@ -9,6 +9,5 @@ namespace BlazorServerApp.Data
         {
         }
         public DbSet<TodoItem> Todos { get; set; }
-
     }
 }
